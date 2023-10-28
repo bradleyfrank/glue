@@ -5,12 +5,12 @@
 # Author: Brad Frank
 # Date: Feb 2022
 # Tested: GNU bash, version 5.1.16(1)-release (x86_64-apple-darwin20.6.0)
-# Requires: tmux
+# Requires: tmux, fzf
 #
 
 
 _tmux_fzf() {
-   fzf-tmux -p --ansi -i --height=50% --exit-0 --inline-info --border "$@"
+   fzf-tmux -p --ansi -i --height=50% --exit-0 --inline-info --border rounded "$@"
 }
 
 
@@ -42,8 +42,7 @@ _get_window_name() {
 
 _get_project_dir() {
   find "${HOME}/Development/Projects" -mindepth 2 -maxdepth 2 -type d \
-    | fzf-tmux -p --ansi -i --height=50% --reverse --exit-0 --inline-info --border rounded \
-      --no-multi --delimiter / --with-nth -2,-1 \
+    | _tmux_fzf --reverse --no-multi --delimiter / --with-nth -2,-1 \
       --preview="eza --color always --classify --no-user --no-permissions --long --all --git {} --"
 }
 
@@ -111,6 +110,14 @@ move_windows() {
 }
 
 
+select_layout() {
+  tmux list-keys \
+    | sed -rn "s/^bind-key.*M-[0-9]\s+select-layout\s(.*)/\1/p" \
+    | _tmux_fzf --no-multi \
+    | xargs tmux select-layout
+}
+
+
 dump_pane() {
   local tmpfile log_dir filename filepath
   tmpfile="$(mktemp)"
@@ -145,6 +152,7 @@ main() {
     dump-pane)      dump_pane ;;
     git-branch)     git_branch "$@" ;;
     move-windows)   move_windows "$@" ;;
+    select-layout)  select_layout "$@" ;;
     *)              echo "$1 not found" >&2; exit 1 ;;
   esac
 }
