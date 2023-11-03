@@ -42,7 +42,10 @@ usage() {
 
 
 _in_git_repo() {
-  [[ $GIT_TOPLEVEL_PATH == "null" ]] && { echo "Must be in a Git repository" >&2; return 1; }
+  if [[ "$GIT_TOPLEVEL_PATH" == "null" ]]; then
+    echo "Must be in a Git repo" >&2
+    return 1
+  fi
 }
 
 
