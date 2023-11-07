@@ -64,7 +64,7 @@ _open_in_tmux() {
     case $TMUX_OPEN_IN in
       window)  tmux-utils open-project -d "$repo_branch_path" ;;
       pane)    tmux split-window -h -c "$repo_branch_path" ;;
-      session) tmux new-session -As $(dirname $GIT_TOPLEVEL_PATH)
+      session) tmux new-session -As "$(dirname "$GIT_TOPLEVEL_PATH")" ;;
     esac
   fi
 }
